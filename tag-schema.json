@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "marketing-agent-ontology-v3",
+  "title": "Marketing Intelligence System — Tag Ontology",
+  "description": "Controlled vocabulary for all creative tagging. No free-text allowed on primary fields. This schema is enforced at A4 output and at memory write.",
+
+  "definitions": {
+
+    "hook_type": {
+      "type": "string",
+      "enum": ["URGENCY", "SCARCITY", "TRUST", "CONVENIENCE", "REWARD", "IDENTITY", "OTHER"],
+      "description": "Primary psychological mechanism of the creative hook"
+    },
+
+    "hook_subtype": {
+      "type": "string",
+      "maxLength": 30,
+      "description": "Required when hook_type = OTHER. Max 30 chars. Examples: 'meme_led', 'trend_hijack', 'festive_seasonal'"
+    },
+
+    "tone": {
+      "type": "string",
+      "enum": ["FUNCTIONAL", "WARM", "URGENT", "ASPIRATIONAL", "REASSURING", "PLAYFUL"]
+    },
+
+    "offer_type": {
+      "type": "string",
+      "enum": ["CASHBACK_FLAT", "CASHBACK_PCT", "LOYALTY_REWARD", "REFERRAL", "TRIAL_FREE", "NO_OFFER"]
+    },
+
+    "cta_type": {
+      "type": "string",
+      "enum": ["DIRECT", "SOFT", "URGENCY_DRIVEN", "BENEFIT_LED"]
+    },
+
+    "audience_type": {
+      "type": "string",
+      "enum": ["NEW", "REPEAT", "HIGH_INTENT", "LOW_INTENT"]
+    },
+
+    "funnel_stage": {
+      "type": "string",
+      "enum": ["ACQUISITION", "ACTIVATION", "RETENTION"]
+    },
+
+    "channel": {
+      "type": "string",
+      "enum": ["SMS", "WHATSAPP", "EMAIL", "SEARCH", "UAC", "PMAX", "DEMAND_GEN", "IN_APP", "PUSH"]
+    },
+
+    "objective_type": {
+      "type": "string",
+      "enum": ["CTR", "CVR", "INSTALL", "LTV"]
+    },
+
+    "creative_format": {
+      "type": "string",
+      "enum": ["TEXT", "IMAGE", "VIDEO", "CAROUSEL"]
+    },
+
+    "conflict_resolution": {
+      "type": "string",
+      "enum": ["CTR_BIAS", "CVR_BIAS", "BALANCED", "NOT_APPLICABLE"]
+    },
+
+    "budget_tier": {
+      "type": "string",
+      "enum": ["test", "scale", "aggressive"],
+      "description": "test = under ₹2L, scale = ₹2L–₹20L, aggressive = above ₹20L"
+    },
+
+    "risk_profile": {
+      "type": "string",
+      "enum": ["conservative", "balanced", "high"]
+    },
+
+    "campaign_maturity": {
+      "type": "string",
+      "enum": ["new", "scaling", "saturated"]
+    },
+
+    "kpi_pressure": {
+      "type": "string",
+      "enum": ["relaxed", "balanced", "aggressive"]
+    }
+  },
+
+  "hook_type_definitions": {
+    "URGENCY": {
+      "mechanism": "Time-limited pressure",
+      "use_when": "A real, verifiable deadline exists",
+      "example": "Offer ends at midnight tonight",
+      "do_not_use_when": "Deadline is fabricated or rolling — this erodes trust over time"
+    },
+    "SCARCITY": {
+      "mechanism": "Quantity-limited pressure",
+      "use_when": "Slots, inventory, or reward pool is genuinely limited",
+      "example": "Only 500 cashback slots remaining",
+      "do_not_use_when": "Confusable with URGENCY — scarcity has no time reference"
+    },
+    "TRUST": {
+      "mechanism": "Social proof, authority, safety signals",
+      "use_when": "Acquisition campaigns, skeptical segments, first-time-user flows",
+      "example": "Trusted by 10Cr+ Indians. RBI regulated.",
+      "do_not_use_when": "High-intent repeat users — they already trust the brand"
+    },
+    "CONVENIENCE": {
+      "mechanism": "Friction removal, ease emphasis",
+      "use_when": "Feature adoption, how-to campaigns, drop-off re-engagement",
+      "example": "Pay in 2 taps. No documents. Works offline.",
+      "do_not_use_when": "Brand campaigns where aspiration, not ease, is the message"
+    },
+    "REWARD": {
+      "mechanism": "Direct incentive",
+      "use_when": "Offer is strong enough to lead with. Cashback, points, prizes.",
+      "example": "Get ₹50 cashback on your next UPI payment.",
+      "do_not_use_when": "Offer is weak — leading with a small reward makes it look smaller"
+    },
+    "IDENTITY": {
+      "mechanism": "Aspiration, belonging, status",
+      "use_when": "Brand campaigns, reactivation, premium product positioning",
+      "example": "Smart money moves. Welcome to Paytm Gold.",
+      "do_not_use_when": "Performance campaigns needing direct response — identity hooks have low CTR"
+    },
+    "OTHER": {
+      "mechanism": "Emerging or format-native hooks",
+      "use_when": "Meme-led, trend hijack, festive-seasonal, creator-led — anything that doesn't fit above",
+      "requires": "hook_subtype (max 30 chars)",
+      "promotion_rule": "If the same hook_subtype appears 3+ times in memory, flag for quarterly ontology review"
+    }
+  },
+
+  "enforcement": {
+    "where": "A4 output schema validator (function, runs before A5)",
+    "rule_1": "All primary fields must match enum values exactly — case-sensitive",
+    "rule_2": "hook_subtype is required when hook_type = OTHER",
+    "rule_3": "hook_subtype max 30 characters",
+    "rule_4": "On validation failure: soft error returned to A4 for correction. Not skipped. Not bypassed.",
+    "rule_5": "Tags are set at A4 (generation time). Never inferred retrospectively from copy text.",
+    "quarterly_review": "Review hook_subtype values quarterly. Promote repeated values (3+ uses) to named hook_type entries."
+  }
+}
